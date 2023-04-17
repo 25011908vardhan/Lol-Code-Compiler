@@ -1,96 +1,166 @@
 %{
     /* directly copied to c file */
-    #include "y.tab.h"
+    #include 
     int countn=0;
+    int no_line=1;
 %}
-%option noyywrap
+
 %option yylineno
 /* declarations */
+
 
 number [0-9]
 letter [a-zA-Z]
 char [{number}{letter}]
-spaces [ \t\n]
+spaces [ \t]+
 numbers {number}+
 letters {letter}+
 chars { char }+
 eol [\n]
 %%  /* rules */
 
-spaces {
-    // chuck it
-    ;
+[ \t]+ {
+    printf(" detected spaces \n " );
 }
 
-"BIGER" { printf("<OP>|GREATERTHAN\n"); return GREATERTHAN; }
-"LEZER" { printf("<OP>|LESSTHAN\n"); return LESSTHAN; }
-"SAEM" { printf("<OP>|ISEQUAL\n"); return ISEQUAL; }
-"DIFFERENT" { printf("<OP>|ISNOTEQUAL\n"); return ISNOTEQUAL; }
+{eol}         { no_line++; }
 
-BTW[A-Za-z0-9 ]*\n { 
-    printf("Single Line Comment ");
-}
+"("         { return '('; }
 
-OBTW[A-Za-z0-9 \n]*_TLDR {
-    printf("Multi Line Comment");
+")"         { return ')'; }
+
+"BIGER" {
+    printf("<OP>|GREATERTHAN\n");
+    return GREATERTHAN;
 }
 
-I_HAS_A {
-    printf( "<KEY|VAR> " );
+
+"LEZER" {
+    printf("<OP>|LESSTHAN\n");
+    return LESSTHAN;
 }
 
-GIMMEH {
-    printf( "<KEY|INPUT> " );
+
+"SAEM" {
+    printf("<OP>|ISEQUAL\n");
+    return ISEQUAL;
 }
 
-PURR { 
-	printf( "<KEY|OUTPUT> " );
+
+"DIFFERENT" {
+    printf("<OP>|ISNOTEQUAL\n");
+    return ISNOTEQUAL;
 }
 
-IZ_IT {
-	printf( "<KEY|IF> ");
+
+"BTW"[A-Za-z0-9 ]*\n {
+    printf("Single Line Comment\n");
+    // return no token
+    no_line++;
 }
 
-RELSE {
-    printf( "<KEY|ELSE> " );
+
+"OBTW"[A-Za-z0-9 \n]*"_TLDR" {
+    printf("Multi Line Comment\n");
+    // return no token
 }
 
-IM_IN_UR_LOOP {
-    printf( "<KEY|LOOP> " );
+
+"I_HAS_A" {
+    printf( "<KEY|VAR>\n" );
+    return VAR;
 }
 
-GTFO {
-    printf( "<KEY|BREAK> " );
+
+"GIMMEH" {
+    printf( "<KEY|INPUT>\n" );
+    return GIMMEH;
 }
 
-YARLY {
-    printf("<KEY|START OF LOOOP>");
-}
-KTHX {
-    printf("<KEY|END OF LOOP>");
+
+"PURR" {
+    printf( "<KEY|OUTPUT>\n" );
+    return PURR;
 }
 
-IZ  { 
-    printf( "<OP|ASSIGNMENT> " );
+
+"IZ_IT" {
+    printf( "<KEY|IF>\n");
+    return IZ_IT;
 }
 
-UP  {
-    printf("<OP|INCR> ");
+
+"RELSE" {
+    printf( "<KEY|ELSE>\n" );
+    return RELSE;
 }
 
-DOWN  {
-    printf("<OP|DECR> ");
+
+"IM_IN_UR_LOOP" {
+    printf( "<KEY|LOOP>\n" );
+    return LOOP;
 }
+
+
+"GTFO" {
+    printf( "<KEY|BREAK>\n" );
+    return BREAK;
+}
+
+
+"YARLY" {
+    printf( "<KEY|START OF BLOCK>\n");
+    return YARLY;
+}
+
+
+"KTHX" {
+    printf( "<KEY|END OF STMT>\n");
+    return KTHX;
+}
+
+
+"IZ"  {
+    printf( "<OP|ASSIGNMENT>\n" );
+    return IZ;
+}
+
+[a-zA-Z][A-Za-z_0-9]* {
+    printf( "<ID> " );
+    return ID;
+}
+
+
 {number}* {
-    printf("<LIT|NUMBER> ");
+    printf( "<LIT|NUMBER>\n");
     return NUMBER;
 }
+
+
 \".*\" {
-    printf("<String>");
+    printf( "<String>\n");
+    return STRING;
 }
+
+"+" {
+    return ADD;
+}
+
+"-" {
+    return SUBTRACT;
+}
+
+"*" {
+    return MULTIPLY;
+}
+
+"/" {
+    return DIVIDE;
+}
+
 .* {
-    printf("Error! ");
+    printf( "Error in line no: %d \n", no_line );
 }
+
 
 %%  /* subroutines */
-
