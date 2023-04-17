@@ -1,5 +1,6 @@
 clear
 flex lol.l
-gcc -o output lex.yy.c -lfl
 yacc -v -d translate.y
-gcc -ll y.tab.c
+gcc -o lex.out lex.yy.c -lfl
+gcc -o y.out -ll y.tab.c
+./y.out < input.lol
