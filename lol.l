@@ -1,6 +1,6 @@
 %{
     /* directly copied to c file */
-    #include 
+    #include "y.tab.h"
     int countn=0;
     int no_line=1;
 %}
